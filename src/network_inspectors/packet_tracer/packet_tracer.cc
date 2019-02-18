@@ -207,9 +207,6 @@ void PacketTracer::activate(const Packet& p)
     if (!s_pkt_trace)
         return;
 
-    if ( p.pkth->flags &  DAQ_PKT_FLAG_TRACE_ENABLED )
-        s_pkt_trace->daq_activated = true;
-    else 
         s_pkt_trace->daq_activated = false;
 
     if (s_pkt_trace->daq_activated or s_pkt_trace->user_enabled or s_pkt_trace->shell_enabled)
@@ -410,8 +407,7 @@ void PacketTracer::open_file()
 
 void PacketTracer::dump_to_daq(const DAQ_PktHdr_t* pkt_hdr)
 {
-    SFDAQ::get_local_instance()->modify_flow_pkt_trace(pkt_hdr, reason,
-        (uint8_t *)buffer, buff_len + 1);
+    return;
 }
 
 void PacketTracer::reset()

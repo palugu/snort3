@@ -499,38 +499,6 @@ void SFDAQInstance::get_tunnel_capabilities()
     {
         uint32_t caps = daq_get_capabilities(daq_mod, daq_hand);
 
-        if (caps & DAQ_CAPA_DECODE_GTP)
-        {
-            daq_tunnel_mask |= TUNNEL_GTP;
-        }
-        if (caps & DAQ_CAPA_DECODE_TEREDO)
-        {
-            daq_tunnel_mask |= TUNNEL_TEREDO;
-        }
-        if (caps & DAQ_CAPA_DECODE_GRE)
-        {
-            daq_tunnel_mask |= TUNNEL_GRE;
-        }
-        if (caps & DAQ_CAPA_DECODE_4IN4)
-        {
-            daq_tunnel_mask |= TUNNEL_4IN4;
-        }
-        if (caps & DAQ_CAPA_DECODE_6IN4)
-        {
-            daq_tunnel_mask |= TUNNEL_6IN4;
-        }
-        if (caps & DAQ_CAPA_DECODE_4IN6)
-        {
-            daq_tunnel_mask |= TUNNEL_4IN6;
-        }
-        if (caps & DAQ_CAPA_DECODE_6IN6)
-        {
-            daq_tunnel_mask |= TUNNEL_6IN6;
-        }
-        if (caps & DAQ_CAPA_DECODE_MPLS)
-        {
-            daq_tunnel_mask |= TUNNEL_MPLS;
-        }
     }
 }
 
@@ -618,33 +586,12 @@ const DAQ_Stats_t* SFDAQInstance::get_stats()
     return &daq_stats;
 }
 
-int SFDAQInstance::query_flow(const DAQ_PktHdr_t* hdr, DAQ_QueryFlow_t* query)
-{
-    return daq_query_flow(daq_mod, daq_hand, hdr, query);
-}
-
 int SFDAQInstance::modify_flow_opaque(const DAQ_PktHdr_t* hdr, uint32_t opaque)
 {
     DAQ_ModFlow_t mod;
 
-    mod.type = DAQ_MODFLOW_TYPE_OPAQUE;
-    mod.length = sizeof(opaque);
-    mod.value = &opaque;
+    mod.opaque = opaque;
 
-    return daq_modify_flow(daq_mod, daq_hand, hdr, &mod);
-}
-
-int SFDAQInstance::modify_flow_pkt_trace(const DAQ_PktHdr_t* hdr, uint8_t verdict_reason,
-    uint8_t* buff, uint32_t buff_len)
-{
-    DAQ_ModFlow_t mod;
-    DAQ_ModFlowPktTrace_t mod_tr;
-    mod_tr.vreason = verdict_reason;
-    mod_tr.pkt_trace_data_len = buff_len;
-    mod_tr.pkt_trace_data = buff;
-    mod.type = DAQ_MODFLOW_TYPE_PKT_TRACE;
-    mod.length = sizeof(DAQ_ModFlowPktTrace_t);
-    mod.value = (void*)&mod_tr;
     return daq_modify_flow(daq_mod, daq_hand, hdr, &mod);
 }
 
@@ -653,51 +600,4 @@ int SFDAQInstance::modify_flow_pkt_trace(const DAQ_PktHdr_t* hdr, uint8_t verdic
 int SFDAQInstance::add_expected(const Packet* ctrlPkt, const SfIp* cliIP, uint16_t cliPort,
         const SfIp* srvIP, uint16_t srvPort, IpProtocol protocol, unsigned timeout_ms, unsigned /* flags */)
 {
-    DAQ_Data_Channel_Params_t daq_params;
-    DAQ_DP_key_t dp_key;
-
-    dp_key.src_af = cliIP->get_family();
-    if (cliIP->is_ip4())
-        dp_key.sa.src_ip4.s_addr = cliIP->get_ip4_value();
-    else
-        memcpy(&dp_key.sa.src_ip6, cliIP->get_ip6_ptr(), sizeof(dp_key.sa.src_ip6));
-    dp_key.src_port = cliPort;
-
-    dp_key.dst_af = srvIP->get_family();
-    if (srvIP->is_ip4())
-        dp_key.da.dst_ip4.s_addr = srvIP->get_ip4_value();
-    else
-        memcpy(&dp_key.da.dst_ip6, srvIP->get_ip6_ptr(), sizeof(dp_key.da.dst_ip6));
-    dp_key.dst_port = srvPort;
-
-    dp_key.protocol = (uint8_t) protocol;
-    dp_key.vlan_cnots = 1;
-    if (ctrlPkt->proto_bits & PROTO_BIT__VLAN)
-        dp_key.vlan_id = layer::get_vlan_layer(ctrlPkt)->vid();
-    else
-        dp_key.vlan_id = 0xFFFF;
-
-    if (ctrlPkt->proto_bits & PROTO_BIT__GTP)
-        dp_key.tunnel_type = DAQ_DP_TUNNEL_TYPE_GTP_TUNNEL;
-    else if (ctrlPkt->proto_bits & PROTO_BIT__MPLS)
-        dp_key.tunnel_type = DAQ_DP_TUNNEL_TYPE_MPLS_TUNNEL;
-/*
-    else if ( ctrlPkt->encapsulated )
-        dp_key.tunnel_type = DAQ_DP_TUNNEL_TYPE_OTHER_TUNNEL;
-*/
-    else
-        dp_key.tunnel_type = DAQ_DP_TUNNEL_TYPE_NON_TUNNEL;
-
-    memset(&daq_params, 0, sizeof(daq_params));
-    daq_params.timeout_ms = timeout_ms;
-/*
-    if (flags & DAQ_DC_FLOAT)
-        daq_params.flags |= DAQ_DATA_CHANNEL_FLOAT;
-    if (flags & DAQ_DC_ALLOW_MULTIPLE)
-        daq_params.flags |= DAQ_DATA_CHANNEL_ALLOW_MULTIPLE;
-    if (flags & DAQ_DC_PERSIST)
-        daq_params.flags |= DAQ_DATA_CHANNEL_PERSIST;
-*/
-
-    return daq_dp_add_dc(daq_mod, daq_hand, ctrlPkt->pkth, &dp_key, nullptr, &daq_params);
 }

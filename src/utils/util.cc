@@ -113,7 +113,7 @@ int DisplayBanner()
     LogMessage("           Copyright (C) 2014-2019 Cisco and/or its affiliates."
                            " All rights reserved.\n");
     LogMessage("           Copyright (C) 1998-2013 Sourcefire, Inc., et al.\n");
-    LogMessage("           Using DAQ version %s\n", daq_version_string());
+    LogMessage("           Using DAQ version daq-2.0.6\n");
     LogMessage("           Using LuaJIT version %s\n", ljv);
     LogMessage("           Using %s\n", SSLeay_version(SSLEAY_VERSION));
     LogMessage("           Using %s\n", pcap_lib_version());

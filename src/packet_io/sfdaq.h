@@ -65,7 +65,6 @@ public:
     int inject(const DAQ_PktHdr_t*, int rev, const uint8_t* buf, uint32_t len);
     bool break_loop(int error);
 
-    SO_PUBLIC int query_flow(const DAQ_PktHdr_t*, DAQ_QueryFlow_t*);
     SO_PUBLIC int modify_flow_opaque(const DAQ_PktHdr_t*, uint32_t opaque);
     int modify_flow_pkt_trace(const DAQ_PktHdr_t*, uint8_t verdict_reason,
         uint8_t* buff, uint32_t buff_len);

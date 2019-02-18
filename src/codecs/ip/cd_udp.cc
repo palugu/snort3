@@ -286,12 +286,6 @@ bool UdpCodec::decode(const RawData& raw, CodecData& codec, DecodeData& snort)
     uint16_t src_port;
     uint16_t dst_port;
 
-    if ((raw.pkth->flags & DAQ_PKT_FLAG_REAL_ADDRESSES) and (codec.ip_layer_cnt == 1))
-    {
-        src_port = ntohs(raw.pkth->n_real_sPort);
-        dst_port = ntohs(raw.pkth->n_real_dPort);
-    }
-    else
     {
         src_port = udph->src_port();
         dst_port =  udph->dst_port();

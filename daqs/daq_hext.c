@@ -228,26 +228,6 @@ static void set_flowstats(Flow_Stats_t* f, enum Search state, const char* s)
             f->responderPkts = atoi(s);
             break;
 
-        case I_DROPPED:
-            f->initiatorPktsDropped = atoi(s);
-            break;
-
-        case R_DROPPED:
-            f->responderPktsDropped = atoi(s);
-            break;
-
-        case I_BYTES:
-            f->initiatorBytesDropped = atoi(s);
-            break;
-
-        case R_BYTES:
-            f->responderBytesDropped = atoi(s);
-            break;
-
-        case IS_QOS:
-            f->isQoSAppliedOnSrcIntf = atoi(s);
-            break;
-
         case SOF_TIME:
             f->sof_timestamp.tv_sec = atoi(s);
             f->sof_timestamp.tv_usec = 0;
@@ -824,22 +804,6 @@ static int hext_daq_set_filter (void* handle, const char* filter)
     return DAQ_ERROR_NOTSUP;
 }
 
-static int hext_query_flow(void* handle, const DAQ_PktHdr_t* hdr, DAQ_QueryFlow_t* query)
-{
-    HextImpl* impl = (HextImpl*)handle;
-
-    if ( hdr->priv_ptr != &impl->pci )  // sanity check
-        return DAQ_ERROR_INVAL;
-
-    if ( query->type == DAQ_USR_QUERY_PCI )
-    {
-        query->value = &impl->pci;
-        query->length = sizeof(impl->pci);
-        return DAQ_SUCCESS;
-    }
-    return DAQ_ERROR_NOTSUP;
-}
-
 //-------------------------------------------------------------------------
 
 #ifdef BUILDING_SO
@@ -873,7 +837,6 @@ DAQ_Module_t hext_daq_module_data =
     .hup_prep = NULL,
     .hup_apply = NULL,
     .hup_post = NULL,
-    .dp_add_dc = NULL,
-    .query_flow = hext_query_flow
+    .dp_add_dc = NULL
 };
 

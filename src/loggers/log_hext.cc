@@ -75,7 +75,7 @@ void DaqMetaEventHandler::handle(DataEvent& event, Flow*)
     int vlan_tag = fs->vlan_tag == 0xfff ?  0 : fs->vlan_tag;
 
     TextLog_Print(hext_log,
-        "\n$%s %d %d %d %d %s %d %s %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+        "\n$%s %d %d %d %d %s %d %s %d %d %d %d %d %d %d %d %d\n",
         cmd,
         fs->ingressZone,
         fs->egressZone,
@@ -86,11 +86,6 @@ void DaqMetaEventHandler::handle(DataEvent& event, Flow*)
         fs->opaque,
         fs->initiatorPkts,
         fs->responderPkts,
-        fs->initiatorPktsDropped,
-        fs->responderPktsDropped,
-        fs->initiatorBytesDropped,
-        fs->responderBytesDropped,
-        fs->isQoSAppliedOnSrcIntf,
         fs->sof_timestamp.tv_sec,
         fs->eof_timestamp.tv_sec,
         vlan_tag,
